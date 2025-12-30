@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, GameState } from './types';
+import React, { useState } from 'react';
+import { Card, GameState, CardCategory } from './types';
 import { CARD_DECK } from './data';
 import { Rules } from './components/Rules';
 import { GameCard } from './components/GameCard';
@@ -21,13 +21,22 @@ const App: React.FC = () => {
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [drawnCount, setDrawnCount] = useState(0);
 
-  // Initialize game
-  const startGame = () => {
-    const shuffled = shuffleDeck(CARD_DECK);
+  // Initialize game with selected categories
+  const startGame = (categories: CardCategory[]) => {
+    // Filter deck based on selection
+    const filteredDeck = CARD_DECK.filter(card => categories.includes(card.category));
+    
+    // Shuffle
+    const shuffled = shuffleDeck(filteredDeck);
+    
     setDeck(shuffled);
-    setCurrentCard(shuffled[0]);
-    setDrawnCount(1);
-    setGameState('playing');
+    if (shuffled.length > 0) {
+      setCurrentCard(shuffled[0]);
+      setDrawnCount(1);
+      setGameState('playing');
+    } else {
+      alert("Please select at least one category!");
+    }
   };
 
   const nextCard = () => {
@@ -36,8 +45,6 @@ const App: React.FC = () => {
       return;
     }
     
-    // Slight delay to allow animation if we were doing complex transitions, 
-    // but for now immediate state update triggers the new card prop in GameCard
     setCurrentCard(deck[drawnCount]);
     setDrawnCount(prev => prev + 1);
   };
@@ -69,7 +76,7 @@ const App: React.FC = () => {
           
           <div className="w-full flex justify-between items-center mb-2 px-4">
              <div className="text-rose-600 font-fun font-bold text-xl">
-               Card {drawnCount}/99
+               Card {drawnCount}/{deck.length}
              </div>
              <button 
                onClick={restartGame} 
@@ -84,14 +91,15 @@ const App: React.FC = () => {
           <div className="w-full bg-white/50 h-3 rounded-full mb-6 overflow-hidden border border-white/60">
             <div 
               className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-500"
-              style={{ width: `${(drawnCount / 99) * 100}%` }}
+              style={{ width: `${(drawnCount / deck.length) * 100}%` }}
             ></div>
           </div>
 
           <GameCard 
             card={currentCard} 
             onNext={nextCard} 
-            remaining={99 - drawnCount} 
+            currentNumber={drawnCount}
+            totalCards={deck.length}
           />
 
           <div className="mt-8 flex gap-4">
@@ -107,7 +115,7 @@ const App: React.FC = () => {
           <Heart size={80} className="text-cupid-red mx-auto mb-6 animate-beat" />
           <h2 className="text-5xl font-hand text-cupid-purple mb-4">Game Over!</h2>
           <p className="font-clean text-xl text-slate-600 mb-8">
-            You've survived all 99 cards! <br/> hope you're still standing (and still in love)!
+            You've finished the deck! <br/> hope you're still standing (and still in love)!
           </p>
           <Button onClick={restartGame} variant="secondary">
             <RefreshCw className="mr-2" /> Play Again
