@@ -5,11 +5,10 @@ import { Heart, Beer, Flame, Zap, HelpCircle } from 'lucide-react';
 interface GameCardProps {
   card: Card;
   onNext: () => void;
-  currentNumber: number;
-  totalCards: number;
+  remaining: number;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({ card, onNext, currentNumber, totalCards }) => {
+export const GameCard: React.FC<GameCardProps> = ({ card, onNext, remaining }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   
   // Reset flip state when card changes
@@ -60,10 +59,7 @@ export const GameCard: React.FC<GameCardProps> = ({ card, onNext, currentNumber,
       >
         {/* CARD BACK (Cover) */}
         <div className="absolute w-full h-full backface-hidden card-backface-hidden rounded-3xl shadow-2xl border-4 border-white overflow-hidden bg-cupid-pink">
-          {/* CSS Pattern instead of external image for offline support */}
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_2px,transparent_2px)] [background-size:20px_20px]"></div>
-          
-          <div className="relative w-full h-full flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')]">
              <Heart size={80} className="text-white drop-shadow-md animate-pulse" />
              <h2 className="text-4xl font-hand text-white mt-4 rotate-[-10deg]">Cupid's</h2>
              <h2 className="text-5xl font-hand text-white rotate-[-5deg] ml-8">Chaos</h2>
@@ -103,7 +99,7 @@ export const GameCard: React.FC<GameCardProps> = ({ card, onNext, currentNumber,
           {/* Bottom Number */}
           <div className="w-full flex justify-between items-end mt-4 opacity-60 font-mono text-sm">
              <span>#{card.id}</span>
-             <span>{currentNumber} / {totalCards}</span>
+             <span>{99 - remaining + 1} / 99</span>
           </div>
         </div>
       </div>
